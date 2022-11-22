@@ -1,0 +1,58 @@
+USE [master]
+GO
+
+DECLARE @kill varchar(8000) = '' SELECT @kill = @kill + 'kill ' + CONVERT(varchar(5), session_id) + ';'
+FROM sys.dm_exec_sessions 
+WHERE database_id = DB_ID('ScrumDB') 
+EXEC(@kill) 
+GO
+
+DROP DATABASE IF EXISTS 
+[ScrumDB] 
+GO 
+
+CREATE DATABASE 
+[ScrumDB] 
+GO 
+
+USE [ScrumDB] 
+GO
+
+/*##################################################
+                ## Setup ##
+####################################################*/
+CREATE TABLE Board
+(
+    Id int identity(1,1) primary key,
+    Title varchar(255) UNIQUE,
+)
+
+CREATE TABLE Task
+(
+    Id int identity(1,1) primary key,
+    Title varchar(255),
+    Description varchar(255),
+    Points int,
+    AssignedTo varchar(255),
+    State varchar(255),
+    Priority varchar(255),
+    TaskId int foreign key references Board(Id)
+)
+
+
+CREATE TABLE User
+(
+    Id int identity(1,1) primary key,
+    Username varchar(255) UNIQUE,
+    Password varchar(255),
+    IsScrumMaster bit,
+    UserId int foreign key references LicenceUser(Id)
+)
+
+CREATE TABLE UserHash
+(
+    Id int identity(1,1) primary key,
+    UserId int foreign key references User(Id),
+    HashString varchar(255),
+    SaltString varchar(255)
+)
