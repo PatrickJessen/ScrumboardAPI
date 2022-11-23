@@ -123,13 +123,13 @@ namespace ScrumboardAPI.Database
 
         private void AddTasksToBoard(in List<BoardState> states, List<Models.Task> tasks)
         {
-            for (int i = 0; i < states.Count; i++)
+            for (int i = 0; i < tasks.Count; i++)
             {
-                for (int j = 0; j < tasks.Count; j++)
+                for (int j = 0; j < states.Count; j++)
                 {
-                    if (states[i].State == tasks[j].State)
+                    if (states[j].Title == TaskStateToString(tasks[i].State))
                     {
-                        states[i].Tasks.Add(tasks[j]);
+                        states[j].Tasks.Add(tasks[i]);
                     }
                 }
             }
