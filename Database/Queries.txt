@@ -34,25 +34,17 @@ CREATE TABLE Task
     Description varchar(255),
     Points int,
     AssignedTo varchar(255),
-    State varchar(255),
-    Priority varchar(255),
+    State int,
+    Priority int,
     TaskId int foreign key references Board(Id)
 )
 
 
-CREATE TABLE User
+CREATE TABLE ScrumUser
 (
     Id int identity(1,1) primary key,
     Username varchar(255) UNIQUE,
-    Password varchar(255),
+    HashPassword varchar(999),
+    Salt varchar(999),
     IsScrumMaster bit,
-    UserId int foreign key references LicenceUser(Id)
-)
-
-CREATE TABLE UserHash
-(
-    Id int identity(1,1) primary key,
-    UserId int foreign key references User(Id),
-    HashString varchar(255),
-    SaltString varchar(255)
 )
