@@ -32,6 +32,16 @@ namespace ScrumboardAPI.Managers
            return scrumDB.GetTaskFromID(id);
         }
 
+        public void UpdateTask(Models.Task task)
+        {
+            scrumDB.UpdateTask(task);
+        }
+
+        public void DeleteTask(int id)
+        {
+            scrumDB.DeleteTask(id);
+        }
+
         public Board GetBoard()
         {
             return scrumDB.GetBoard();

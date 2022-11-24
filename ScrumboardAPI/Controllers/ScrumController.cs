@@ -45,5 +45,21 @@ namespace ScrumboardAPI.Controllers
         {
             return Ok(scrum.GetBoard());
         }
+
+        [HttpPut]
+        [Route("/UpdateTask")]
+        public IActionResult UpdateTask(Models.Task task)
+        {
+            scrum.UpdateTask(task);
+            return Ok();
+        }
+
+        [HttpDelete]
+        [Route("/DeleteTask")]
+        public IActionResult DeleteTask(int id)
+        {
+            scrum.DeleteTask(id);
+            return Ok();
+        }
     }
 }

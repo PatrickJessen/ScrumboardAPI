@@ -7,6 +7,7 @@ namespace ScrumboardAPI.Models
     public enum TaskPriority { VERY_LOW, LOW, MEDIUM, HIGH, VERY_HIGH }
     public class Task
     {
+        public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public int Points { get; set; }

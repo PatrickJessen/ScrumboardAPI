@@ -50,6 +50,45 @@ namespace ScrumboardAPI.Database
             }
         }
 
+        public void UpdateTask(Models.Task task)
+        {
+            try
+            {
+                Database.Connect();
+                string query = $"UPDATE Task SET Title = @title, Description = @description, Points = @points, AssignedTo = @assignedTo, State = @state, Priority = @priority " +
+                    $"WHERE Id = {task.Id}";
+                Database.ExecuteQuery(query);
+                Database.command.Parameters.AddWithValue("@title", task.Title);
+                Database.command.Parameters.AddWithValue("@description", task.Description);
+                Database.command.Parameters.AddWithValue("@points", task.Points);
+                Database.command.Parameters.AddWithValue("@assignedTo", task.AssignedTo);
+                Database.command.Parameters.AddWithValue("@state", task.State);
+                Database.command.Parameters.AddWithValue("@priority", task.Priority);
+                Database.command.ExecuteScalar();
+                Database.Close();
+            }
+            catch
+            {
+                Database.Close();
+            }
+        }
+
+        public void DeleteTask(int id)
+        {
+            try
+            {
+                Database.Connect();
+                string query = $"DELETE Task WHERE Id = {id}";
+                Database.ExecuteQuery(query);
+                Database.command.ExecuteScalar();
+                Database.Close();
+            }
+            catch
+            {
+                Database.Close();
+            }
+        }
+
         public List<Models.Task> GetTasks()
         {
             List<Models.Task> tasks = new List<Models.Task>();
@@ -73,8 +112,10 @@ namespace ScrumboardAPI.Database
                 string assignedTo = Database.dataReader["AssignedTo"].ToString();
                 TaskState state = (TaskState)Database.dataReader["State"];
                 TaskPriority priority = (TaskPriority)Database.dataReader["Priority"];
-                int id = (int)Database.dataReader["TaskId"];
-                tasks.Add(new Models.Task(title, state, description, points, assignedTo, priority));
+                int id = (int)Database.dataReader["Id"];
+                Models.Task t = new Models.Task(title, state, description, points, assignedTo, priority);
+                t.Id = id;
+                tasks.Add(t);
             }
             Database.Close();
             return tasks;
