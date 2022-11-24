@@ -48,3 +48,8 @@ CREATE TABLE ScrumUser
     Salt varchar(999),
     IsScrumMaster bit,
 )
+
+INSERT INTO Board (Title) VALUES ('DONE')
+INSERT INTO Board (Title) VALUES ('IN PROGRESS')
+INSERT INTO Board (Title) VALUES ('REVIEW')
+INSERT INTO Board (Title) VALUES ('DONE')
