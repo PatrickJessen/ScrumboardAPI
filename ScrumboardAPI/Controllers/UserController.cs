@@ -25,5 +25,17 @@ namespace ScrumboardAPI.Controllers
         {
             return Ok(um.GetUser(username));
         }
+
+        [HttpPost]
+        [Route("/LoginUser")]
+        public IActionResult Login(string username, string password)
+        {
+            User user = um.Login(username, password);
+            if (user != null)
+            {
+                return Ok(user);
+            }
+            return Problem("Failed");
+        }
     }
 }

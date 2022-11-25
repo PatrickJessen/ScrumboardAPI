@@ -19,5 +19,24 @@ namespace ScrumboardAPI.Managers
         {
             return userDB.GetUser(username);
         }
+
+        public User Login(string username, string password)
+        {
+            User user = userDB.Login(username);
+            if (VeryfiUser(user, password))
+            {
+                return user;
+            }
+            return null;
+        }
+
+        private bool VeryfiUser(User user, string password)
+        {
+            if (CryptoService.VerifyPassword(password, user.Password, user.Salt))
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }
