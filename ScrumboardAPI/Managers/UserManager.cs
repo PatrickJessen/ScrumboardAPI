@@ -23,6 +23,10 @@ namespace ScrumboardAPI.Managers
         public User Login(string username, string password)
         {
             User user = userDB.Login(username);
+            if (user == null)
+            {
+                return null;
+            }
             if (VeryfiUser(user, password))
             {
                 return user;
