@@ -30,8 +30,8 @@ namespace ScrumboardAPI.Database
             try
             {
                 Database.Connect();
-                string query = $"INSERT INTO Task (Title, Description, Points, AssignedTo, State, Priority, TaskId) VALUES" +
-                    $" (@title, @description, @points, @assignedTo, @state, @priority, @taskId)";
+                string query = $"INSERT INTO Task (Title, Description, Points, AssignedTo, State, Priority, BoardId) VALUES" +
+                    $" (@title, @description, @points, @assignedTo, @state, @priority, SELECT id FROM Board WHERE id = @boardId)";
                 Database.ExecuteQuery(query);
                 Database.command.Parameters.AddWithValue("@title", task.Title);
                 Database.command.Parameters.AddWithValue("@description", task.Description);
@@ -39,7 +39,7 @@ namespace ScrumboardAPI.Database
                 Database.command.Parameters.AddWithValue("@assignedTo", task.AssignedTo);
                 Database.command.Parameters.AddWithValue("@state", task.State);
                 Database.command.Parameters.AddWithValue("@priority", task.Priority);
-                Database.command.Parameters.AddWithValue("@taskId", boardId);
+                Database.command.Parameters.AddWithValue("@boardId", boardId);
                 Database.command.ExecuteScalar();
                 Database.Close();
                 return "Successfully created board";
@@ -95,19 +95,18 @@ namespace ScrumboardAPI.Database
             try
             {
                 Database.Connect();
-                string query = $"SELECT id FROM Board WHERE Title = {title}";
+                string query = $"SELECT id FROM Board WHERE Title = '{title}'";
                 Database.ExecuteQuery(query);
+                Database.dataReader = Database.command.ExecuteReader();
                 int id = 0;
                 while (Database.dataReader.Read())
                 {
                     id = (int)Database.dataReader["id"];
                 }
-                Database.Close();
                 return id;
             }
             catch
             {
-                Database.Close();
                 return -1;
             }
         }
@@ -119,30 +118,29 @@ namespace ScrumboardAPI.Database
             try
             {
                 Database.Connect();
+                string query = $"SELECT * FROM Task WHERE BoardId = {boardId}";
+                Database.ExecuteQuery(query);
+                Database.command.ExecuteScalar();
+                Database.dataReader = Database.command.ExecuteReader();
+                while (Database.dataReader.Read())
+                {
+                    string title = Database.dataReader["Title"].ToString();
+                    string description = Database.dataReader["Description"].ToString();
+                    int points = (int)Database.dataReader["Points"];
+                    string assignedTo = Database.dataReader["AssignedTo"].ToString();
+                    TaskState state = (TaskState)Database.dataReader["State"];
+                    TaskPriority priority = (TaskPriority)Database.dataReader["Priority"];
+                    int id = (int)Database.dataReader["Id"];
+                    Models.Task t = new Models.Task(title, state, description, points, assignedTo, priority);
+                    t.Id = id;
+                    tasks.Add(t);
+                }
+                return tasks;
             }
             catch
             {
                 return null;
             }
-            string query = $"SELECT * FROM Task WHERE BoardId = {boardId}";
-            Database.ExecuteQuery(query);
-            Database.command.ExecuteScalar();
-            Database.dataReader = Database.command.ExecuteReader();
-            while (Database.dataReader.Read())
-            {
-                string title = Database.dataReader["Title"].ToString();
-                string description = Database.dataReader["Description"].ToString();
-                int points = (int)Database.dataReader["Points"];
-                string assignedTo = Database.dataReader["AssignedTo"].ToString();
-                TaskState state = (TaskState)Database.dataReader["State"];
-                TaskPriority priority = (TaskPriority)Database.dataReader["Priority"];
-                int id = (int)Database.dataReader["Id"];
-                Models.Task t = new Models.Task(title, state, description, points, assignedTo, priority);
-                t.Id = id;
-                tasks.Add(t);
-            }
-            Database.Close();
-            return tasks;
         }
 
         public Models.Task GetTaskFromID(int id)
@@ -176,7 +174,7 @@ namespace ScrumboardAPI.Database
                 Database.dataReader = Database.command.ExecuteReader();
                 while (Database.dataReader.Read())
                 {
-                    board = new Board(Database.dataReader["Title"].ToString());
+                    board = new Board((int)Database.dataReader["id"], Database.dataReader["Title"].ToString());
                 }
                 Database.Close();
                 board.Tasks = GetTasks(boardTitle);

@@ -50,18 +50,21 @@ namespace ScrumboardAPI.Database
 
         public User Login(string username)
         {
+            User user = new User();
             try
             {
                 Database.Connect();
                 string query = $"SELECT * FROM ScrumUser WHERE Username = '{username}'";
                 Database.ExecuteQuery(query);
                 Database.dataReader = Database.command.ExecuteReader();
-                Database.dataReader.Read();
-                User user = new User();
-                user.Username = Database.dataReader["Username"].ToString();
-                user.Password = Database.dataReader["HashPassword"].ToString();
-                user.Salt = Database.dataReader["Salt"].ToString();
-                user.IsScrumMaster = (bool)Database.dataReader["IsScrumMaster"];
+                while (Database.dataReader.Read())
+                {
+
+                    user.Username = Database.dataReader["Username"].ToString();
+                    user.Password = Database.dataReader["HashPassword"].ToString();
+                    user.Salt = Database.dataReader["Salt"].ToString();
+                    user.IsScrumMaster = (bool)Database.dataReader["IsScrumMaster"];
+                }
                 Database.Close();
                 return user;
             }

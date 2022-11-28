@@ -14,12 +14,14 @@
     }
     public class Board
     {
+        int Id { get; set; }
         public string Title { get; set; }
         public List<Task> Tasks { get; set; }
-        public Board(string title)
+        public Board(int id, string title)
         {
-            Tasks = new List<Task>();
+            Id = id;
             Title = title;
+            Tasks = new List<Task>();
         }
     }
 }
