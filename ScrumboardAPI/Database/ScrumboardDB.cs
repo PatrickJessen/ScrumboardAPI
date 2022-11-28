@@ -1,4 +1,5 @@
-﻿using ScrumboardAPI.Models;
+﻿using Microsoft.Extensions.Primitives;
+using ScrumboardAPI.Models;
 using System.Threading.Tasks;
 
 namespace ScrumboardAPI.Database
@@ -89,8 +90,31 @@ namespace ScrumboardAPI.Database
             }
         }
 
-        public List<Models.Task> GetTasks()
+        private int GetBoardIdFromTitle(string title)
         {
+            try
+            {
+                Database.Connect();
+                string query = $"SELECT id FROM Board WHERE Title = {title}";
+                Database.ExecuteQuery(query);
+                int id = 0;
+                while (Database.dataReader.Read())
+                {
+                    id = (int)Database.dataReader["id"];
+                }
+                Database.Close();
+                return id;
+            }
+            catch
+            {
+                Database.Close();
+                return -1;
+            }
+        }
+
+        public List<Models.Task> GetTasks(string boardTitle)
+        {
+            int boardId = GetBoardIdFromTitle(boardTitle);
             List<Models.Task> tasks = new List<Models.Task>();
             try
             {
@@ -100,7 +124,7 @@ namespace ScrumboardAPI.Database
             {
                 return null;
             }
-            string query = $"SELECT * FROM Task";
+            string query = $"SELECT * FROM Task WHERE BoardId = {boardId}";
             Database.ExecuteQuery(query);
             Database.command.ExecuteScalar();
             Database.dataReader = Database.command.ExecuteReader();
@@ -140,9 +164,9 @@ namespace ScrumboardAPI.Database
             }
         }
 
-        public Board GetBoard()
+        public Board GetBoard(string boardTitle)
         {
-            Board board = new Board();
+            Board board = null;
             try
             {
                 Database.Connect();
@@ -152,16 +176,40 @@ namespace ScrumboardAPI.Database
                 Database.dataReader = Database.command.ExecuteReader();
                 while (Database.dataReader.Read())
                 {
-                    board.States.Add(new BoardState(Database.dataReader["Title"].ToString()));
+                    board = new Board(Database.dataReader["Title"].ToString());
                 }
                 Database.Close();
-                AddTasksToBoard(board.States, GetTasks());
+                board.Tasks = GetTasks(boardTitle);
                 return board;
             }
             catch
             {
                 Database.Close();
                 return null;
+            }
+        }
+
+        public List<string> GetSprintNames()
+        {
+            List<string> list = new List<string>();
+            try
+            {
+                Database.Connect();
+                string query = $"SELECT * FROM Board";
+                Database.ExecuteQuery(query);
+                //Database.command.ExecuteScalar();
+                Database.dataReader = Database.command.ExecuteReader();
+                while (Database.dataReader.Read())
+                {
+                    list.Add(Database.dataReader["Title"].ToString());
+                }
+                Database.Close();
+                return list;
+            }
+            catch
+            {
+                Database.Close();
+                return new List<string>();
             }
         }
 

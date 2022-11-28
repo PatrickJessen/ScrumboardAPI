@@ -36,7 +36,7 @@ CREATE TABLE Task
     AssignedTo varchar(255),
     State int,
     Priority int,
-    TaskId int foreign key references Board(Id)
+    BoardId int foreign key references Board(Id)
 )
 
 
@@ -49,7 +49,4 @@ CREATE TABLE ScrumUser
     IsScrumMaster bit,
 )
 
-INSERT INTO Board (Title) VALUES ('TODO')
-INSERT INTO Board (Title) VALUES ('IN PROGRESS')
-INSERT INTO Board (Title) VALUES ('REVIEW')
-INSERT INTO Board (Title) VALUES ('DONE')
+INSERT INTO Board (Title) VALUES ('First sprint')

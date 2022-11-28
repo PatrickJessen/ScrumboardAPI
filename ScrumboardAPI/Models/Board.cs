@@ -14,10 +14,12 @@
     }
     public class Board
     {
-        public List<BoardState> States { get; set; }
-        public Board()
+        public string Title { get; set; }
+        public List<Task> Tasks { get; set; }
+        public Board(string title)
         {
-            States = new List<BoardState>();
+            Tasks = new List<Task>();
+            Title = title;
         }
     }
 }

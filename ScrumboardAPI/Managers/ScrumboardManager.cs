@@ -22,9 +22,9 @@ namespace ScrumboardAPI.Managers
             return scrumDB.CreateNewTask(task);
         }
 
-        public List<Models.Task> GetTasks()
+        public List<Models.Task> GetTasks(string title)
         {
-            return scrumDB.GetTasks();
+            return scrumDB.GetTasks(title);
         }
 
         public Models.Task GetTaskFromID(int id)
@@ -42,9 +42,14 @@ namespace ScrumboardAPI.Managers
             scrumDB.DeleteTask(id);
         }
 
-        public Board GetBoard()
+        public Board GetBoard(string boardTitle)
         {
-            return scrumDB.GetBoard();
+            return scrumDB.GetBoard(boardTitle);
+        }
+
+        public List<string> GetSprintNames()
+        {
+            return scrumDB.GetSprintNames();
         }
     }
 }

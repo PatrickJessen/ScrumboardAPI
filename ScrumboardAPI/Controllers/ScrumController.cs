@@ -27,9 +27,9 @@ namespace ScrumboardAPI.Controllers
 
         [HttpGet]
         [Route("/GetTasks")]
-        public IActionResult GetTasks()
+        public IActionResult GetTasks(string title)
         {
-            return Ok(scrum.GetTasks());
+            return Ok(scrum.GetTasks(title));
         }
 
         [HttpGet]
@@ -41,9 +41,9 @@ namespace ScrumboardAPI.Controllers
 
         [HttpGet]
         [Route("/GetScrumboard")]
-        public IActionResult GetBoard()
+        public IActionResult GetBoard(string boardTitle)
         {
-            return Ok(scrum.GetBoard());
+            return Ok(scrum.GetBoard(boardTitle));
         }
 
         [HttpPut]
@@ -60,6 +60,13 @@ namespace ScrumboardAPI.Controllers
         {
             scrum.DeleteTask(id);
             return Ok();
+        }
+
+        [HttpGet]
+        [Route("/GetSprintNames")]
+        public IActionResult GetSprintNames()
+        {
+            return Ok(scrum.GetSprintNames());
         }
     }
 }
