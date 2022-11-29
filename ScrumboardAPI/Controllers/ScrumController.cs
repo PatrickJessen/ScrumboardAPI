@@ -68,5 +68,13 @@ namespace ScrumboardAPI.Controllers
         {
             return Ok(scrum.GetSprintNames());
         }
+
+        [HttpDelete]
+        [Route("/DeleteSprint")]
+        public IActionResult DeleteBoard(string title)
+        {
+            scrum.DeleteBoard(title);
+            return Ok();
+        }
     }
 }

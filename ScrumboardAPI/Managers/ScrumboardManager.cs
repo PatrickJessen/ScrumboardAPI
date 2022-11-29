@@ -51,5 +51,10 @@ namespace ScrumboardAPI.Managers
         {
             return scrumDB.GetSprintNames();
         }
+
+        public void DeleteBoard(string title)
+        {
+            scrumDB.DeleteBoard(title);
+        }
     }
 }
