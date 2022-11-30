@@ -1,27 +1,31 @@
 ﻿using ScrumboardAPI.Models;
+using System.Data.SqlClient;
 
 namespace ScrumboardAPI.Database
 {
     public class ScrumUserDB
     {
+        //private const string connectionString = "Server=PJJ-P15S-2022\\SQLEXPRESS;Database=ScrumDB;Trusted_Connection=True;"; // school
+        private const string connectionString = "Server=DESKTOP-R394HDQ;Database=ScrumDB;Trusted_Connection=True;"; // home
         public string CreateUser(User user)
         {
             try
             {
-                Database.Connect();
+                SqlConnection connect = new SqlConnection(connectionString);
+                connect.Open();
                 string query = $"INSERT INTO ScrumUser (Username, Salt, HashPassword, IsScrumMaster) VALUES (@username, @salt, @hashPassword, @isScrumMaster)";
-                Database.ExecuteQuery(query);
-                Database.command.Parameters.AddWithValue("@username", user.Username);
-                Database.command.Parameters.AddWithValue("@salt", user.Salt);
-                Database.command.Parameters.AddWithValue("@hashPassword", user.Password);
-                Database.command.Parameters.AddWithValue("@isScrumMaster", user.IsScrumMaster);
-                Database.command.ExecuteScalar();
-                Database.Close();
+                SqlDataAdapter adapter = new SqlDataAdapter(query, connect);
+                SqlCommand command = new SqlCommand(query, connect);
+                command.Parameters.AddWithValue("@username", user.Username);
+                command.Parameters.AddWithValue("@salt", user.Salt);
+                command.Parameters.AddWithValue("@hashPassword", user.Password);
+                command.Parameters.AddWithValue("@isScrumMaster", user.IsScrumMaster);
+                command.ExecuteScalar();
+                connect.Close();
                 return "Successfully created user";
             }
             catch
             {
-                Database.Close();
                 return "Error 400! Failed to connect to database";
             }
         }
@@ -30,20 +34,21 @@ namespace ScrumboardAPI.Database
         {
             try
             {
-                Database.Connect();
+                SqlConnection connect = new SqlConnection(connectionString);
+                connect.Open();
                 string query = $"SELECT * FROM ScrumUser";
-                Database.ExecuteQuery(query);
-                Database.dataReader = Database.command.ExecuteReader();
+                SqlDataAdapter adapter = new SqlDataAdapter(query, connect);
+                SqlCommand command = new SqlCommand(query, connect);
+                SqlDataReader dataReader = command.ExecuteReader();
                 User user = new User();
-                Database.dataReader.Read();
-                user.Username = Database.dataReader["Username"].ToString();
-                user.IsScrumMaster = (bool)Database.dataReader["IsScrumMaster"];
-                Database.Close();
+                dataReader.Read();
+                user.Username = dataReader["Username"].ToString();
+                user.IsScrumMaster = (bool)dataReader["IsScrumMaster"];
+                connect.Close();
                 return user;
             }
             catch
             {
-                Database.Close();
                 return null;
             }
         }
@@ -53,24 +58,25 @@ namespace ScrumboardAPI.Database
             User user = new User();
             try
             {
-                Database.Connect();
+                SqlConnection connect = new SqlConnection(connectionString);
+                connect.Open();
                 string query = $"SELECT * FROM ScrumUser WHERE Username = '{username}'";
-                Database.ExecuteQuery(query);
-                Database.dataReader = Database.command.ExecuteReader();
-                while (Database.dataReader.Read())
+                SqlDataAdapter adapter = new SqlDataAdapter(query, connect);
+                SqlCommand command = new SqlCommand(query, connect);
+                SqlDataReader dataReader = command.ExecuteReader();
+                while (dataReader.Read())
                 {
 
-                    user.Username = Database.dataReader["Username"].ToString();
-                    user.Password = Database.dataReader["HashPassword"].ToString();
-                    user.Salt = Database.dataReader["Salt"].ToString();
-                    user.IsScrumMaster = (bool)Database.dataReader["IsScrumMaster"];
+                    user.Username = dataReader["Username"].ToString();
+                    user.Password = dataReader["HashPassword"].ToString();
+                    user.Salt = dataReader["Salt"].ToString();
+                    user.IsScrumMaster = (bool)dataReader["IsScrumMaster"];
                 }
-                Database.Close();
+                connect.Close();
                 return user;
             }
             catch
             {
-                Database.Close();
                 return null;
             }
         }

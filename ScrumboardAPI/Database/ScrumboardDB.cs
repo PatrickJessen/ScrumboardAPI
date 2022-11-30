@@ -8,8 +8,8 @@ namespace ScrumboardAPI.Database
 {
     public class ScrumboardDB
     {
-        private const string connectionString = "Server=PJJ-P15S-2022\\SQLEXPRESS;Database=ScrumDB;Trusted_Connection=True;"; // school
-        //private const string connectionString = "Server=DESKTOP-R394HDQ;Database=ScrumDB;Trusted_Connection=True;"; // home
+        //private const string connectionString = "Server=PJJ-P15S-2022\\SQLEXPRESS;Database=ScrumDB;Trusted_Connection=True;"; // school
+        private const string connectionString = "Server=DESKTOP-R394HDQ;Database=ScrumDB;Trusted_Connection=True;"; // home
         public string CreateNewBoard(string title)
         {
             try
@@ -219,7 +219,6 @@ namespace ScrumboardAPI.Database
             }
             catch
             {
-                Database.Close();
                 return null;
             }
         }
@@ -250,6 +249,8 @@ namespace ScrumboardAPI.Database
                     sprints.Add(s);
                 }
                 connect.Close();
+
+                // Sort the ids in sprints so it gets in numeric order 1,2,3..etc
                 for (int i = 0; i < sprints.Count; i++)
                 {
                     for (int j = 0; j < sprints.Count; j++)
@@ -271,42 +272,6 @@ namespace ScrumboardAPI.Database
             catch
             {
                 return new List<string>();
-            }
-        }
-
-        private void AddTasksToBoard(in List<BoardState> states, List<Models.Task> tasks)
-        {
-            for (int i = 0; i < tasks.Count; i++)
-            {
-                for (int j = 0; j < states.Count; j++)
-                {
-                    if (states[j].Title == TaskStateToString(tasks[i].State))
-                    {
-                        states[j].Tasks.Add(tasks[i]);
-                    }
-                }
-            }
-        }
-
-        private int GetBoardId(string title)
-        {
-            try
-            {
-                SqlConnection connect = new SqlConnection(connectionString);
-                connect.Open();
-                string query = $"SELECT Id FROM Board WHERE Title = @title";
-                SqlDataAdapter adapter = new SqlDataAdapter(query, connect);
-                SqlCommand command = new SqlCommand(query, connect);
-                command.Parameters.AddWithValue("@title", title);
-                command.ExecuteScalar();
-                int id = Convert.ToInt32(command.ExecuteScalar());
-                connect.Close();
-                return id;
-            }
-            catch
-            {
-                Database.Close();
-                return 0;
             }
         }
 
